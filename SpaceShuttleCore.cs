@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,15 +9,12 @@ namespace SpaceShuttleCore
     public partial class SpaceShuttle
     {
         #region Поля
-
-        private double _fuelKg;
-        private double _oxygenHours;
-        private int _hullIntegrity;
-
+        private double _fuelKg; //масса топлива
+        private double _oxygenHours; //запас кислорода
+        private int _hullIntegrity; //прочность корпуса
         #endregion
 
         #region Свойства
-
         public string ShuttleName { get; set; }
 
         public double FuelKg
@@ -40,35 +37,24 @@ namespace SpaceShuttleCore
                 else _hullIntegrity = value;
             }
         }
-
-        public bool IsOperational => 15 < _hullIntegrity && _oxygenHours > 0;
-
+        public bool IsOperational => _hullIntegrity > 15 && _oxygenHours > 0;
         #endregion
 
-    }
-
-    public class Designer
-    {
-        public string ShuttleName { get; set; }
-        public double FuelKg { get; set; }
-        public double OxygenHours { get; set; }
-        public int HullIntegrity { get; set; }
-
-        public Designer()
+        #region Конструктор
+        /// <summary>
+        /// Конструктор с параметрами.
+        /// </summary>
+        /// <param name="shuttleName">Имя</param>
+        /// <param name="fuelKg">Топливо</param>
+        /// <param name="oxygenHours">Кислород</param>
+        /// <param name="hullIntegrity">Корпус</param>
+        public SpaceShuttle(string shuttleName, double fuelKg, double oxygenHours, int hullIntegrity)
         {
-            ShuttleName = "Буран-Next";
-            FuelKg = 2400.0;
-            OxygenHours = 48.0;
-            HullIntegrity = 100;
+            this.ShuttleName = shuttleName;
+            this.FuelKg = fuelKg;
+            this._oxygenHours = oxygenHours;
+            this.HullIntegrity = hullIntegrity;
         }
-
-        public Designer(string name, double _fuelKg, double _oxygenHours, int _hullIntegrity)
-        {
-            this.ShuttleName = name;
-            this.FuelKg = _fuelKg;
-            this.OxygenHours = _oxygenHours;
-            this.HullIntegrity = _hullIntegrity;
-        }
-
+        #endregion
     }
 }
