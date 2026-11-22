@@ -1,48 +1,55 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpaceShuttleEngines
+namespace SpaceShuttleCore
 {
     public partial class SpaceShuttle
     {
-        private void ExecuteOrbitalBurn(double burnTimeSeconds, double thrustPower, double hullIntegrity)
+        /// <summary>
+        /// моделирует работу маршевого двигателя: Расход топлива вычисляется по формуле: burnTimeSeconds * thrustPower * 2.5. Если топлива недостаточно, маневр прерывается с выводом ошибки в консоль. При успешном прожиге топливо списывается, а износ корпуса увеличивается на 1% за каждые 10 секунд работы.
+        /// </summary>
+        /// <param name="burnTimeSeconds">время работы двигателя</param>
+        /// <param name="thrustPower">тяга(сила вырабатываемая двигателем)</param>
+        public void ExecuteOrbitalBurn(double burnTimeSeconds, double thrustPower)
         {
-            double flue = burnTimeSeconds * thrustPower * 2.5;
+            double expenseFuel = burnTimeSeconds * thrustPower * 2.5; //расход топлива
 
-            if (flue < 0) Console.WriteLine("Топливо недостаточно!");
-
-            else if (flue > 0 && flue >= 50)
+            //хватает ли топлива в баке?
+            if (expenseFuel > _fuelKg) //не хватило
             {
-                flue = flue - 50;
-                hullIntegrity = hullIntegrity * 0.1;
-
-                Console.WriteLine($"Остаток топлива - [{flue}]");
-                Console.WriteLine($"Износ корпуса  - [{hullIntegrity}]");
-
+                Console.WriteLine("Топливо недостаточно!");
+                return;
             }
-
-            else Console.WriteLine("Топливо недостаточно для пуска");
-
-
-
-
+            else //хватило
+            {
+                FuelKg = FuelKg - expenseFuel;
+                int wear = (int)(burnTimeSeconds / 10);
+                HullIntegrity = HullIntegrity - wear;
+                Console.WriteLine($"Манёвр удался! Сожжено: {FuelKg} топлива. Износ корпуса: {wear}%.");
+            }
         }
-
-        private double PerformAtmosphericEntry(int hullIntegrity, double OxygenHours)
+        /// <summary>
+        /// маневр входа в плотные слои атмосферы: Снижает прочность корпуса _hullIntegrity на случайную величину от 10% до 25%. Списывает 1.5 часа запаса кислорода.
+        /// </summary>
+        /// <param name="hullIntegrity">прочность корпуса</param>
+        /// <param name="oxygenHours">запас кислорода</param>
+        /// <returns></returns>
+        public void PerformAtmosphericEntry()
         {
             Random rnd = new Random();
 
-            hullIntegrity = rnd.Next(3, 11);
-            Console.WriteLine($"Прочность снизилась на {hullIntegrity}");
+            int damagehullIntegrity = rnd.Next(10, 26);
+            _hullIntegrity = _hullIntegrity - damagehullIntegrity;
 
-            OxygenHours = OxygenHours - 1.5;
-
-            return hullIntegrity;
+            _oxygenHours = _oxygenHours - 1.5;
+            if (_oxygenHours <= 0) //не ушел ли кислород в минус?
+            {
+                _oxygenHours = 0;
+            }
+            Console.WriteLine($"Вход в атмосферу выполнен: износ корпуса {damagehullIntegrity}%, а так же кислород -1.5 ч.");
         }
     }
-
-
 }
